@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser'
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException  } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser())
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // ตัด properties ของข้อมูลที่ส่งเข้ามาที่ไม่ได้นิยามไว้ใน dto ออกไป
