@@ -24,6 +24,11 @@
 
 ## Description
 
+## CodeRefFrom YT
+Cr.https://www.youtube.com/@mikelopster
+https://www.youtube.com/watch?v=ufonGrmL-KE&t=4085s
+https://mikelopster.dev/posts/nestjs-mongo
+
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
