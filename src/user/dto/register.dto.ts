@@ -8,6 +8,7 @@ export class RegisterDTO {
     readonly email: string;
 
     @IsString()
+    @IsOptional()
     readonly password: string;
 
     @IsString()
