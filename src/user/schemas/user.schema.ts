@@ -20,6 +20,9 @@ export class User {
 
   @Prop()
   googleId: string
+
+  @Prop()
+  picProfile: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

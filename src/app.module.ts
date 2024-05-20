@@ -7,11 +7,17 @@ import { OrdersModule } from './orders/orders.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
-
-
+import { MulterModule } from '@nestjs/platform-express';
+import { MulterOptions } from './config/upload.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..','uploads')
+      
+  }),
     //เพิ่มไว้สำหรับอ่าน .env
     ConfigModule.forRoot({
       isGlobal:true,
@@ -25,8 +31,13 @@ import { ConfigModule } from '@nestjs/config';
     ProductsModule,
     OrdersModule,
     AuthModule,
-    UserModule,],
+    UserModule,
+    MulterModule.register(MulterOptions)
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,
+    
+  ],
 })
+
 export class AppModule { }
