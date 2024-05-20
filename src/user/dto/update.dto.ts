@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsOptional } from 'class-validator';
 
 
 
@@ -20,5 +20,9 @@ export class UpdateDTO {
     @IsString()
     @IsOptional()
     readonly picProfile : string
+
+    @IsBoolean()
+    @IsOptional()
+    readonly isVerify: boolean;
 
   }

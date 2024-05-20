@@ -11,6 +11,9 @@ import { MulterModule } from '@nestjs/platform-express';
 import { MulterOptions } from './config/upload.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MailerModule } from '@nestjs-modules/mailer';
+
+
 
 @Module({
   imports: [
@@ -34,7 +37,22 @@ import { join } from 'path';
     OrdersModule,
     AuthModule,
     UserModule,
-    MulterModule.register(MulterOptions)
+    MulterModule.register(MulterOptions),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('EMAIL_HOST'),
+          port: configService.get<number>('EMAIL_PORT'),
+          secure: false,
+          auth: {
+            user: configService.get<string>('EMAIL_USER'),
+            pass: configService.get<string>('EMAIL_PASSWORD'),
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AppController],
   providers: [AppService,

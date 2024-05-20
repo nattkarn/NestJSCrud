@@ -6,15 +6,65 @@ import { User, UserDocument } from './schemas/user.schema'; // Import UserDocume
 import { RegisterDTO } from './dto/register.dto';
 import { UpdateDTO } from './dto/update.dto';
 
+import { v4 as uuidv4 } from 'uuid'; // For generating unique tokens
+import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    private mailerService : MailerService
   ) {} // Use UserDocument type
 
   async create(registerDTO: RegisterDTO): Promise<User> {
-    const newUser = new this.userModel(registerDTO);
-    return await newUser.save();
+    const activationToken = uuidv4();
+    
+    let data ={
+      ...registerDTO,
+      activationToken:activationToken
+    }
+    
+    const newUser = new this.userModel(data);
+    newUser.tokenCreatedAt = new Date();  // Set token creation time
+    await newUser.save();
+
+    const activationLink = `http://localhost:3000/user/activation?token=${activationToken}`;
+
+    await this.mailerService.sendMail({
+      to: newUser.email,
+      subject: 'Account Activation',
+      text: `Please activate your account using the following link: ${activationLink}`,
+    });
+
+    return newUser
+  }
+
+  async activateAccount(token: string): Promise<boolean> {
+    const user = await this.userModel.findOne({ activationToken: token });
+    if (!user) {
+      throw new BadRequestException('token is invalid');
+    }
+    // Check if the token is expired
+    const tokenExpirationTime = 24 * 60 * 60 * 1000; // 24 hours
+    const tokenAge = Date.now() - new Date(user.tokenCreatedAt).getTime();
+    if (tokenAge > tokenExpirationTime) {
+      const activationToken = uuidv4();
+      const activationLink = `http://localhost:3000/user/activation?token=${activationToken}`;
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Account Activation is resent',
+        text: `Please activate your account using the following link: ${activationLink}`,
+      });
+      user.activationToken = activationToken
+      user.tokenCreatedAt = new Date();  // Set token creation time
+      await user.save()
+      return false
+    }
+
+
+    user.isVerify = true;
+    user.activationToken = null; // Optionally clear the token after activation
+    await user.save();
+    return true;
   }
 
   async updateUser(id: string, updateDTO: UpdateDTO, fileName:string){

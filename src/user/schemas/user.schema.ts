@@ -23,6 +23,16 @@ export class User {
 
   @Prop()
   picProfile: string
+  
+  @Prop({ default: false })
+  isVerify: boolean
+  
+  @Prop({default: ''})
+  activationToken : string
+  
+  @Prop()
+  tokenCreatedAt: Date;  // Add this field for token creation time
+  
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

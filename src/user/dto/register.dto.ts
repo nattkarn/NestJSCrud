@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsOptional , IsBoolean} from 'class-validator';
 
 
 
@@ -25,5 +25,13 @@ export class RegisterDTO {
     @IsString()
     @IsOptional()
     readonly picProfile : string
+
+    @IsBoolean()
+    @IsOptional()
+    readonly isVerify : boolean
+
+    @IsString()
+    @IsOptional()
+    readonly activationToken : string
 
   }

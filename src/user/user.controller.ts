@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Request, Patch, UseInterceptors, UploadedFile, Param, ParseFilePipeBuilder, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, Patch, UseInterceptors, UploadedFile, Query, ParseFilePipeBuilder, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterDTO } from './dto/register.dto';
 import { UpdateDTO} from './dto/update.dto'
@@ -9,9 +9,13 @@ import { MulterOptions } from '../config/upload.config';
 
 
 
+
+
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService,
+    
+  ) { }
 
   @Get('/')
   status() {
@@ -20,8 +24,23 @@ export class UserController {
 
   @Post('/register')
   create(@Body() registerDto: RegisterDTO) {
+
     return this.userService.create(registerDto);
+
+
+    
   }
+
+  @Get('/activation')
+  async activate(@Query('token') token: string) {
+    const result = await this.userService.activateAccount(token);
+    if (result) {
+      return 'Account successfully activated!';
+    }
+    return 'Invalid or expired activation token.';
+  }
+
+
 
   @UseGuards(JwtAuthGuard)
   @Patch('/update')
