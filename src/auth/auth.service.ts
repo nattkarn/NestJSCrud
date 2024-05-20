@@ -41,14 +41,14 @@ export class AuthService {
       throw new Error('Google login failed: No user information received.');
     }
 
-    const { email, name, picture, googleId } = req.user;
+    const { email, name, picProfile, googleId } = req.user;
     let user = await this.userModel.findOne({ email });
 
     if (!user) {
       user = new this.userModel({
         email,
         name,
-        picture,
+        picProfile,
         googleId,
       });
       await user.save();
