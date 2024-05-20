@@ -2,9 +2,20 @@ import { NestFactory } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser'
 import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException  } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('NestJS Crud example')
+    .setDescription('The NestJS Crud API')
+    .setVersion('1.0')
+    .addTag('NestJS Crud')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+
   app.use(cookieParser())
   app.useGlobalPipes(
     new ValidationPipe({
