@@ -13,9 +13,17 @@ export class AuthController {
   @Post('/login')
   async login(@Request() req, @Res({ passthrough:true}) res){
     const { accessToken } = await this.authService.login(req.user);
-    res.cookie('access_token', accessToken, {
-      httpOnly: true,
-    });
+    res.cookie('access_token', 'Test');
+    return {
+      message: 'Login successful'
+    }
+  }
+
+  // @UseGuards(LocalAuthGuard)
+  @Get('/test')
+  async test(@Res({ passthrough:true}) res){
+    const  accessToken  = "test";
+    res.cookie('access_token', accessToken);
     return {
       message: 'Login successful'
     }
