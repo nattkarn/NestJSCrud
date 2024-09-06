@@ -4,13 +4,11 @@ import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
     
-    @IsOptional()
     @IsString()
-    readonly name: string
+    readonly email: string;
 
-    @IsOptional()
     @IsString()
-    readonly tel: string
+    readonly password: string;
 }
 
 

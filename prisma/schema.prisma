@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-
-
-
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
@@ -21,17 +16,28 @@ model Product {
   updatedAt   DateTime @updatedAt
 
   // One product can have many orders
-  orders      Order[]  // One-to-many relationship with orders
+  orders Order[] // One-to-many relationship with orders
 }
 
 model Order {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   quantity  Int
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
   // Foreign key to Product
   productId Int
-  product   Product   @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 
-  @@index([productId])  // Index on productId for faster queries
+  @@index([productId]) // Index on productId for faster queries
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  tel       String?
+  // token     String?  @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
