@@ -1,26 +1,77 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+
+  constructor(private userService: UserService,
+    private jwtService: JwtService
+
+  ) { }
+  async validateUser(email: string, pass: string) {
+
+    try {
+
+      const user = await this.userService.findByEmail(email);
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      }
+
+      if (user && (await bcrypt.compare(pass, user.password))) {
+        const result = user
+        console.log(result)
+        return {
+          user: {
+            id: result.id,
+            email: result.email,
+          }
+        }
+      }
+
+      else {
+        return null
+      }
+
+    }
+    catch (error) {
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(user: any) {
+    try {
+      // Check if user has an email
+      if (!user || !user.user.email) {
+        throw new HttpException('Email must be provided', HttpStatus.BAD_REQUEST);
+      }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+      // Find the user by email
+      const getUser = await this.userService.findByEmail(user.user.email);
+      if (!getUser) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+      // Create the payload for JWT
+      const payload = { sub: getUser.id, email: getUser.email };
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+      // Generate access token
+      const access_token = await this.jwtService.sign(payload);
+      if (!access_token) {
+        throw new HttpException('Failed to generate access token', HttpStatus.EXPECTATION_FAILED);
+      }
+
+      // Return the user and the access token
+      return {
+        user: {
+          email: getUser.email,  // Using email from the found user
+          access_token: access_token,
+        }
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }

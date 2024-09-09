@@ -7,10 +7,18 @@ import { PrismaModule } from './prisma/prisma.module';
 import { OrdersModule } from './orders/orders.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ProductsModule, PrismaModule, OrdersModule, AuthModule, UserModule],
+  imports: [
+
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    })
+
+    , ProductsModule, PrismaModule, OrdersModule, AuthModule, UserModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
-export class AppModule {}
+export class AppModule { }
